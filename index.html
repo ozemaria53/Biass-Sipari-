@@ -241,13 +241,13 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 
   <div class="page" id="page-orders">
     <!-- Filter bar -->
-    <div style="padding:.7rem 1rem;background:var(--card);border-bottom:1.5px solid var(--sep);display:flex;gap:.5rem;overflow-x:auto;scrollbar-width:none;">
-      <button class="option-chip active" onclick="setOrderFilter('all',this)" style="flex-shrink:0;">Tümü</button>
-      <button class="option-chip" onclick="setOrderFilter('alinmadi',this)" style="flex-shrink:0;">⏳ Bekleyen</button>
-      <button class="option-chip" onclick="setOrderFilter('alindi',this)" style="flex-shrink:0;">✅ Alındı</button>
-      <button class="option-chip" onclick="setOrderFilter('islemde',this)" style="flex-shrink:0;">⚙️ İşlemde</button>
-      <button class="option-chip" onclick="setOrderFilter('hazir',this)" style="flex-shrink:0;">📦 Hazır</button>
-      <button class="option-chip" onclick="setOrderFilter('gonderildi',this)" style="flex-shrink:0;">🚚 Geçmiş</button>
+    <div style="padding:.6rem .8rem;background:var(--card);border-bottom:1.5px solid var(--sep);display:flex;gap:.4rem;flex-wrap:wrap;">
+      <button class="option-chip active" onclick="setOrderFilter('all',this)" style="font-size:.75rem;padding:.4rem .7rem;">Tümü</button>
+      <button class="option-chip" onclick="setOrderFilter('alinmadi',this)" style="font-size:.75rem;padding:.4rem .7rem;">⏳ Bekleyen</button>
+      <button class="option-chip" onclick="setOrderFilter('alindi',this)" style="font-size:.75rem;padding:.4rem .7rem;">✅ Alındı</button>
+      <button class="option-chip" onclick="setOrderFilter('islemde',this)" style="font-size:.75rem;padding:.4rem .7rem;">⚙️ İşlemde</button>
+      <button class="option-chip" onclick="setOrderFilter('hazir',this)" style="font-size:.75rem;padding:.4rem .7rem;">📦 Hazır</button>
+      <button class="option-chip" onclick="setOrderFilter('gonderildi',this)" style="font-size:.75rem;padding:.4rem .7rem;">🚚 Geçmiş</button>
     </div>
     <div id="orderList" style="margin-top:.5rem;"></div>
   </div>

@@ -158,6 +158,8 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .status-alindi{background:var(--yellow-bg);color:var(--yellow);}
 .status-islemde{background:var(--orange-bg);color:var(--orange);}
 .status-hazir{background:var(--green-bg);color:var(--green);}
+.status-gonderildi{background:var(--purple-bg);color:var(--purple);}
+.stripe-gonderildi{background:var(--purple);}
 .stripe-alinmadi{background:var(--red);}
 .stripe-alindi{background:var(--yellow);}
 .stripe-islemde{background:var(--orange);}
@@ -190,6 +192,11 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .au-edit{background:var(--blue-bg);color:var(--blue);}
 .au-del{background:var(--red-bg);color:var(--red);}
 
+
+.photo-area-sm{display:flex;gap:.5rem;flex-wrap:wrap;padding:.6rem 1rem;}
+.photo-thumb-sm{width:64px;height:64px;border-radius:9px;object-fit:cover;border:2px solid var(--border);position:relative;}
+.photo-add-sm{width:64px;height:64px;border-radius:9px;background:var(--card2);border:2px dashed var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;font-size:1.3rem;color:var(--text3);gap:2px;}
+.photo-add-sm span{font-size:.6rem;font-weight:800;}
 ::-webkit-scrollbar{width:4px;}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
 </style>
@@ -229,7 +236,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
     <button class="tab active" onclick="switchTab('orders')">Siparişler<span class="tab-badge" id="openBadge" style="display:none;"></span></button>
     <button class="tab" onclick="switchTab('new')">+ Yeni</button>
     <button class="tab" onclick="switchTab('notifs')">Bildirimler<span class="tab-badge" id="notifBadge" style="display:none;"></span></button>
-    <button class="tab" id="adminTab" onclick="switchTab('admin')" style="display:none;">Yönetim</button>
+    <button class="tab" id="settingsTab" onclick="openSettings()" style="display:none;">⚙️</button>
   </div>
 
   <div class="page" id="page-orders">
@@ -240,6 +247,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
       <button class="option-chip" onclick="setOrderFilter('alindi',this)" style="flex-shrink:0;">✅ Alındı</button>
       <button class="option-chip" onclick="setOrderFilter('islemde',this)" style="flex-shrink:0;">⚙️ İşlemde</button>
       <button class="option-chip" onclick="setOrderFilter('hazir',this)" style="flex-shrink:0;">📦 Hazır</button>
+      <button class="option-chip" onclick="setOrderFilter('gonderildi',this)" style="flex-shrink:0;">🚚 Geçmiş</button>
     </div>
     <div id="orderList" style="margin-top:.5rem;"></div>
   </div>
@@ -270,13 +278,6 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
   <div class="page" id="page-notifs" style="display:none;">
     <div id="notifList" style="margin-top:.5rem;"></div>
   </div>
-
-  <div class="page" id="page-admin" style="display:none;">
-    <div style="padding:.8rem 1rem 0;">
-      <div id="userListEl"></div>
-      <button class="submit-btn blue" onclick="openAddUser()">+ Kullanıcı Ekle</button>
-    </div>
-  </div>
 </div>
 
 <!-- PRODUCT FORM OVERLAY -->
@@ -301,6 +302,32 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
       <button class="sheet-close" onclick="closeSheet('detailOverlay')">✕</button>
     </div>
     <div id="detailBody"></div>
+  </div>
+</div>
+
+<!-- SETTINGS OVERLAY -->
+<div class="overlay" id="settingsOverlay" onclick="oClose(event,'settingsOverlay')">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-hdr"><div class="sheet-title">⚙️ Ayarlar</div><button class="sheet-close" onclick="closeSheet('settingsOverlay')">✕</button></div>
+    <div style="padding:.5rem .9rem 1rem;">
+      <div style="background:var(--card2);border-radius:var(--radius);border:1.5px solid var(--sep);overflow:hidden;margin-bottom:.8rem;">
+        <div style="padding:.75rem 1rem;font-size:.78rem;font-weight:900;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;border-bottom:1.5px solid var(--sep);">👥 Kullanıcı Yönetimi</div>
+        <div id="settingsUserList" style="padding:.4rem 0;"></div>
+        <div style="padding:.5rem 1rem .7rem;">
+          <button onclick="openAddUser()" style="width:100%;background:var(--blue-bg);color:var(--blue);border:2px solid var(--blue);border-radius:12px;padding:.7rem;font-family:var(--font);font-size:.88rem;font-weight:800;cursor:pointer;">+ Kullanıcı Ekle</button>
+        </div>
+      </div>
+      <div style="background:var(--card2);border-radius:var(--radius);border:1.5px solid var(--sep);overflow:hidden;margin-bottom:.8rem;">
+        <div style="padding:.75rem 1rem;font-size:.78rem;font-weight:900;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;border-bottom:1.5px solid var(--sep);">❌ Sipariş İptal</div>
+        <div style="padding:.8rem 1rem;">
+          <div style="font-size:.82rem;color:var(--text3);font-weight:600;margin-bottom:.6rem;">İptal edilecek siparişi seçin. Fabrika sorumlularına bildirim gidecek.</div>
+          <select id="cancelOrderSelect" style="width:100%;background:var(--card);border:2px solid var(--border);border-radius:12px;padding:.7rem 1rem;font-family:var(--font);font-size:.88rem;font-weight:700;color:var(--text);outline:none;margin-bottom:.5rem;"></select>
+          <button onclick="cancelSelectedOrder()" style="width:100%;background:var(--red-bg);color:var(--red);border:2px solid var(--red);border-radius:12px;padding:.7rem;font-family:var(--font);font-size:.88rem;font-weight:800;cursor:pointer;">❌ İptal Et</button>
+        </div>
+      </div>
+      <div style="text-align:center;font-size:.72rem;color:var(--text3);font-weight:600;padding:.3rem;">Sipariş Sistemi v1</div>
+    </div>
   </div>
 </div>
 
@@ -362,6 +389,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 </div>
 
 <div class="toast" id="toast"></div>
+<input type="file" id="productPhotoInput" accept="image/*" style="display:none;" onchange="handleProductPhoto(event)">
 
 <script>
 // ════════════════════════════════════════════
@@ -402,10 +430,10 @@ const SEFFAF_LASTIK_URUNLER = [
   {kod:'ASK-1012',olcu:'10x0,12',paket:'690 GR',metre:'500 M'},
 ];
 const FITIL_URUNLER = [
-  {olcu:'0,70 MM',paket:'455 GR',metre:'1000 M'},{olcu:'0,80 MM',paket:'595 GR',metre:'1000 M'},
-  {olcu:'0,90 MM',paket:'750 GR',metre:'1000 M'},{olcu:'1,00 MM',paket:'925 GR',metre:'1000 M'},
-  {olcu:'1,10 MM',paket:'1120 GR',metre:'1000 M'},{olcu:'1,20 MM',paket:'1350 GR',metre:'1000 M'},
-  {olcu:'1,30 MM',paket:'1550 GR',metre:'1000 M'},{olcu:'1,40 MM',paket:'1800 GR',metre:'1000 M'},
+  {olcu:'0,70 MM',paket:'227 GR',metre:'500 M'},{olcu:'0,80 MM',paket:'295 GR',metre:'500 M'},
+  {olcu:'0,90 MM',paket:'375 GR',metre:'500 M'},{olcu:'1,00 MM',paket:'460 GR',metre:'500 M'},
+  {olcu:'1,10 MM',paket:'560 GR',metre:'500 M'},{olcu:'1,20 MM',paket:'665 GR',metre:'500 M'},
+  {olcu:'1,30 MM',paket:'780 GR',metre:'500 M'},{olcu:'1,40 MM',paket:'900 GR',metre:'500 M'},
   {olcu:'1,50 MM',paket:'2000 GR',metre:'1000 M'},{olcu:'1,60 MM',paket:'2300 GR',metre:'1000 M'},
   {olcu:'1,70 MM',paket:'2650 GR',metre:'1000 M'},{olcu:'1,80 MM',paket:'3000 GR',metre:'1000 M'},
   {olcu:'1,90 MM',paket:'3300 GR',metre:'1000 M'},{olcu:'2,00 MM',paket:'3700 GR',metre:'1000 M'},
@@ -441,7 +469,7 @@ const KB_KALINLIKLAR = ['Standart','Kalın','İnce'];
 const MAKARA_METRELER = ['250 m','500 m','1.000 m','3.000 m'];
 const SERIGRAFI_RENKLER = ['Siyah','Altın Yaldız','Gümüş','Diğer'];
 const SERIGRAFI_MAKARA = ['250 m','500 m','1.000 m'];
-const KB_UZUNLUKLAR = Array.from({length:61},(_,i)=>((i+1)*5+45)+'mm').filter((_,i)=>i<=60);
+const KB_UZUNLUKLAR = Array.from({length:91},(_,i)=>(i+1)*5+45).filter(v=>v<=500).map(v=>v+'mm');
 // 50mm to 350mm step 5
 
 // ════════════════════════════════════════════
@@ -539,7 +567,7 @@ function doLogin(){
   document.getElementById('mainApp').style.display='flex';
   document.getElementById('topDot').style.background=u.color;
   document.getElementById('topName').textContent=u.name;
-  if(u.role==='yonetici')document.getElementById('adminTab').style.display='';
+  if(u.role==='yonetici')document.getElementById('settingsTab').style.display='';
   loadFromServer().then(()=>{renderAll();updateBadges();});
 }
 function doLogout(){
@@ -554,7 +582,7 @@ function doLogout(){
 // ════════════════════════════════════════════
 function switchTab(tab){
   activeTab=tab;
-  const tabs=['orders','new','notifs','admin'];
+  const tabs=['orders','new','notifs'];
   document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',tabs[i]===tab));
   tabs.forEach(v=>{const el=document.getElementById('page-'+v);if(el)el.style.display=v===tab?'block':'none';});
   if(tab==='new'){curItems=[];renderAddedItems();}
@@ -567,7 +595,6 @@ function switchTab(tab){
 function renderAll(){
   if(activeTab==='orders')renderOrders();
   else if(activeTab==='notifs')renderNotifs();
-  else if(activeTab==='admin')renderAdmin();
   updateBadges();
 }
 
@@ -594,10 +621,7 @@ function setOrderFilter(f,btn){
 function renderOrders(){
   const el=document.getElementById('orderList');if(!el)return;
   let data=[...orders].sort((a,b)=>b.ts-a.ts);
-  // Merkez ofis sadece kendi siparişlerini görür
-  if(curUser&&curUser.role==='merkez'){
-    data=data.filter(o=>o.createdBy===curUser.id);
-  }
+  // Herkes tüm siparişleri görür
   if(orderFilter!=='all')data=data.filter(o=>o.status===orderFilter);
   if(!data.length){
     el.innerHTML='<div class="empty-state"><div class="empty-icon">📦</div><div class="empty-txt">Sipariş Yok</div><div class="empty-sub">'+( orderFilter==='all'?'Yeni sipariş oluşturmak için + Yeni sekmesini kullanın':'Bu filtrede sipariş bulunmuyor')+'</div></div>';
@@ -607,7 +631,7 @@ function renderOrders(){
 }
 function buildOrderCard(o){
   const u=users.find(x=>x.id===o.createdBy)||{name:o.createdByName||'?',color:'#888'};
-  const statusLabel={alinmadi:'⏳ Bekliyor',alindi:'✅ Alındı',islemde:'⚙️ İşlemde',hazir:'📦 Hazır'}[o.status]||o.status;
+  const statusLabel={alinmadi:'⏳ Bekliyor',alindi:'✅ Alındı',islemde:'⚙️ İşlemde',hazir:'📦 Hazır',gonderildi:'🚚 Gönderildi'}[o.status]||o.status;
   const isFabrika=curUser&&curUser.role==='fabrika';
   const isMerkez=curUser&&curUser.role==='merkez';
   const isYonetici=curUser&&curUser.role==='yonetici';
@@ -623,6 +647,8 @@ function buildOrderCard(o){
     actions=`<div class="order-actions"><button class="order-act-btn btn-warning" onclick="updateStatus('${o.id}','islemde')">⚙️ İşleme Al</button><button class="order-act-btn btn-detail" onclick="openDetail('${o.id}')">Detay</button></div>`;
   } else if((isFabrika||isYonetici)&&o.status==='islemde'){
     actions=`<div class="order-actions"><button class="order-act-btn btn-primary" onclick="updateStatus('${o.id}','hazir')">📦 Hazır</button><button class="order-act-btn btn-detail" onclick="openDetail('${o.id}')">Detay</button></div>`;
+  } else if((isFabrika||isYonetici)&&o.status==='hazir'){
+    actions=`<div class="order-actions"><button class="order-act-btn" style="background:var(--purple);color:white;" onclick="updateStatus('${o.id}','gonderildi')">🚚 Gönderildi</button><button class="order-act-btn btn-detail" onclick="openDetail('${o.id}')">Detay</button></div>`;
   } else {
     actions=`<div class="order-actions"><button class="order-act-btn btn-detail" style="flex:none;" onclick="openDetail('${o.id}')">Detay Gör</button></div>`;
   }
@@ -654,7 +680,7 @@ function openDetail(id){
   const o=orders.find(x=>x.id===id);if(!o)return;
   document.getElementById('detailTitle').textContent='Sipariş #'+o.id;
   const u=users.find(x=>x.id===o.createdBy)||{name:o.createdByName||'?',color:'#888'};
-  const statusLabel={alinmadi:'⏳ Bekliyor',alindi:'✅ Alındı',islemde:'⚙️ İşlemde',hazir:'📦 Hazır'}[o.status]||o.status;
+  const statusLabel={alinmadi:'⏳ Bekliyor',alindi:'✅ Alındı',islemde:'⚙️ İşlemde',hazir:'📦 Hazır',gonderildi:'🚚 Gönderildi'}[o.status]||o.status;
   let html=`<div class="detail-section">
     <div class="detail-hdr">Sipariş Bilgileri</div>
     <div class="detail-row"><span class="detail-key">Oluşturan</span><span class="detail-val" style="display:flex;align-items:center;gap:.4rem;"><span style="width:8px;height:8px;border-radius:50%;background:${u.color};display:inline-block;"></span>${u.name}</span></div>
@@ -707,6 +733,12 @@ function formatItemDetail(item){
     s+=`<div class="detail-key" style="margin-top:.4rem;">Kesme Ölçüleri</div>`;
     item.kesmeRows.forEach(r=>{s+=`<div class="detail-row"><span class="detail-key">${r.uzunluk}</span><span class="detail-val">${r.qty} adet</span></div>`;});
   }
+  if(item.photos&&item.photos.length){
+    s+=`<div class="detail-key" style="margin-top:.4rem;">Fotoğraflar</div>`;
+    s+=`<div style="display:flex;gap:.4rem;flex-wrap:wrap;padding:.3rem 0;">`;
+    item.photos.forEach(src=>{s+=`<img src="${src}" style="width:72px;height:72px;border-radius:9px;object-fit:cover;border:2px solid var(--border);">`;});
+    s+=`</div>`;
+  }
   return s;
 }
 
@@ -739,14 +771,18 @@ function confirmAlindi(){
   showToast('✅ Sipariş alındı olarak işaretlendi');
 }
 function updateStatus(id,newStatus){
-  const labels={islemde:'işleme alındı',hazir:'hazır olarak işaretlendi'};
+  const labels={islemde:'işleme alındı',hazir:'hazır olarak işaretlendi',gonderildi:'gönderildi olarak işaretlendi'};
   const o=orders.find(x=>x.id===id);if(!o)return;
   const prev=o.status;
   o.status=newStatus;o.updatedAt=nowStr();
   o.timeline=o.timeline||[];
   o.timeline.push({status:newStatus,at:nowStr(),by:curUser.id,byName:curUser.name});
   saveLocal();
-  addNotif(o,newStatus);
+  if(newStatus==='gonderildi'){
+    addNotifToFabrika(o,'gonderildi');
+  } else {
+    addNotif(o,newStatus);
+  }
   syncAction('updateOrder',{order:o,prevStatus:prev});
   renderAll();
   showToast('✅ Sipariş '+labels[newStatus]);
@@ -830,6 +866,7 @@ function removeItem(i){curItems.splice(i,1);renderAddedItems();}
 
 function openProductForm(cat){
   curProductCat=cat;kbRows=[];editingKbOlcu=null;
+  resetPhotos();
   const titles={seffaf_lastik:'Şeffaf Lastik',fitil:'Fitiller',balen:'Balenler',kesme_balen:'Kesme Balen',makara_seffaf:'Makara Şeffaf Lastik',serigrafi:'Serigrafi Baskılı Yazı'};
   document.getElementById('productFormTitle').textContent=titles[cat]||cat;
   document.getElementById('productFormBody').innerHTML=buildProductForm(cat);
@@ -868,7 +905,7 @@ function toggleChip(groupId,val,multi=false){
 }
 
 function buildSeffafLastikForm(){
-  const opts=SEFFAF_LASTIK_URUNLER.map(u=>`<div class="option-chip" data-val="${u.kod}" onclick="toggleChip('sl_urun','${u.kod}')" style="min-width:120px;">${u.kod}<br><span style="font-size:.65rem;opacity:.7;">${u.olcu} · ${u.metre}</span></div>`).join('');
+  const opts=SEFFAF_LASTIK_URUNLER.map(u=>`<div class="option-chip" data-val="${u.kod}" onclick="toggleChip('sl_urun','${u.kod}')" style="min-width:120px;">${u.kod}<br><span style="font-size:.65rem;opacity:.7;">${u.olcu}</span></div>`).join('');
   return`
     <div class="f-section"><label class="f-lbl">Ürün Seçimi</label><div class="option-grid" id="sl_urun" style="grid-template-columns:1fr 1fr;">${opts}</div></div>
     <div class="f-section"><label class="f-lbl">Görünüm</label>${chipGroup('sl_renk',['Buzlu','Cam Gibi','Siyah'])}</div>
@@ -880,15 +917,25 @@ function buildFitilForm(){
   return`
     <div class="f-section"><label class="f-lbl">Ürün Ölçüsü</label><div class="option-grid" id="fitil_urun">${opts}</div></div>
     <div class="f-section"><label class="f-lbl">Malzeme</label>${chipGroup('fitil_malzeme',['TPU','PVC'])}</div>
-    <div class="f-section"><label class="f-lbl">Renk</label>${chipGroup('fitil_renk',['Şeffaf','Siyah','Buzlu'])}</div>
+    <div class="f-section"><label class="f-lbl">Renk</label>
+      ${chipGroup('fitil_renk',['Şeffaf','Siyah','Buzlu','Özel Renk'])}
+      <div class="f-card" id="fitil_ozel_renk_wrap" style="display:none;margin-top:.4rem;">
+        <div class="f-row"><span class="f-ico">🎨</span><input type="text" id="fitil_ozel_renk" placeholder="Renk adı veya kodu..."></div>
+      </div>
+    </div>
     <div class="f-section"><label class="f-lbl">Paketleme</label>${chipGroup('fitil_paket',['Poşet','Makara'])}</div>
-    <div class="f-section"><label class="f-lbl">Sipariş Miktarı</label><div class="f-card"><div class="f-row"><span class="f-ico">📦</span><input type="text" id="fitil_miktar" placeholder="Ör: 5 koli, 10 makara..."></div></div></div>`;
+    <div class="f-section"><label class="f-lbl">Sipariş Miktarı</label><div class="f-card"><div class="f-row"><span class="f-ico">📦</span><input type="text" id="fitil_miktar" placeholder="Ör: 5 koli, 10 makara..."></div></div></div>
+    <div class="f-section"><label class="f-lbl">Özel Not</label><div class="f-card"><div class="f-row"><span class="f-ico">📝</span><textarea id="fitil_not" placeholder="Özel not (opsiyonel)..." style="height:56px;resize:none;"></textarea></div></div></div>
+    <div class="f-section"><label class="f-lbl">Fotoğraf (opsiyonel)</label>
+      <div class="photo-area-sm" id="fitil_photos"><div class="photo-add-sm" onclick="triggerPhoto('fitil')">📷<span>Ekle</span></div></div>
+    </div>`;
 }
 function buildBalenForm(){
   return`
     <div class="f-section"><label class="f-lbl">Balen Ölçüsü</label>${chipGroup('balen_olcu',BALEN_OLCULER)}</div>
     <div class="f-section"><label class="f-lbl">Kasnak Seçimi</label>${chipGroup('balen_kasnak',BALEN_KASNAKLAR)}</div>
     <div class="f-section"><label class="f-lbl">Renk</label>${chipGroup('balen_renk',BALEN_RENKLER)}</div>
+    <div class="f-section"><label class="f-lbl">Kalınlık</label>${chipGroup('balen_kalinlik',KB_KALINLIKLAR)}</div>
     <div class="f-section"><label class="f-lbl">Sipariş Miktarı</label><div class="f-card"><div class="f-row"><span class="f-ico">📦</span><input type="text" id="balen_miktar" placeholder="Ör: 10 kasnak..."></div></div></div>
     <div class="f-section"><label class="f-lbl">Özel Not</label><div class="f-card"><div class="f-row"><span class="f-ico">📝</span><textarea id="balen_not" placeholder="Özel not (opsiyonel)..." style="height:56px;resize:none;"></textarea></div></div></div>`;
 }
@@ -897,6 +944,7 @@ function buildKesmeBalen(){
   const uzunluklar=[];for(let i=50;i<=350;i+=5)uzunluklar.push(i+'mm');
   const olcuOpts=BALEN_OLCULER.map(o=>`<div class="option-chip" data-val="${o}" onclick="selectKbOlcu('${o}')">${o}</div>`).join('');
   return`
+    <div class="f-section"><label class="f-lbl">Müşteri İsmi</label><div class="f-card"><div class="f-row"><span class="f-ico">👤</span><input type="text" id="kb_musteri" placeholder="Müşteri adı..."></div></div></div>
     <div class="f-section"><label class="f-lbl">Balen Ölçüsü</label><div class="option-grid" id="kb_olcu">${olcuOpts}</div></div>
     <div class="f-section"><label class="f-lbl">Renk</label>${chipGroup('kb_renk',BALEN_RENKLER)}</div>
     <div class="f-section"><label class="f-lbl">Kalınlık</label>${chipGroup('kb_kalinlik',KB_KALINLIKLAR)}</div>
@@ -910,7 +958,10 @@ function buildKesmeBalen(){
         <div id="kb_rows"></div>
       </div>
     </div>
-    <div class="f-section"><label class="f-lbl">Özel Not</label><div class="f-card"><div class="f-row"><span class="f-ico">📝</span><textarea id="kb_not" placeholder="Özel not (opsiyonel)..." style="height:56px;resize:none;"></textarea></div></div></div>`;
+    <div class="f-section"><label class="f-lbl">Özel Not</label><div class="f-card"><div class="f-row"><span class="f-ico">📝</span><textarea id="kb_not" placeholder="Özel not (opsiyonel)..." style="height:56px;resize:none;"></textarea></div></div></div>
+    <div class="f-section"><label class="f-lbl">Fotoğraf (opsiyonel)</label>
+      <div class="photo-area-sm" id="kb_photos"><div class="photo-add-sm" onclick="triggerPhoto('kb')">📷<span>Ekle</span></div></div>
+    </div>`;
 }
 function selectKbOlcu(olcu){
   editingKbOlcu=olcu;
@@ -955,7 +1006,10 @@ function buildSerigrafForm(){
     <div class="f-section"><label class="f-lbl">Yazı Karakteri</label><div class="f-card"><div class="f-row"><span class="f-ico">🔤</span><input type="text" id="ser_karakter" placeholder="Yazı karakteri/fontu..."></div></div></div>
     <div class="f-section"><label class="f-lbl">Makara Seçeneği</label>${chipGroup('ser_makara',SERIGRAFI_MAKARA)}</div>
     <div class="f-section"><label class="f-lbl">Sipariş Miktarı</label><div class="f-card"><div class="f-row"><span class="f-ico">📦</span><input type="text" id="ser_miktar" placeholder="Ör: 10 makara..."></div></div></div>
-    <div class="f-section"><label class="f-lbl">Özel Not</label><div class="f-card"><div class="f-row"><span class="f-ico">📝</span><textarea id="ser_not" placeholder="Özel not (opsiyonel)..." style="height:56px;resize:none;"></textarea></div></div></div>`;
+    <div class="f-section"><label class="f-lbl">Özel Not</label><div class="f-card"><div class="f-row"><span class="f-ico">📝</span><textarea id="ser_not" placeholder="Özel not (opsiyonel)..." style="height:56px;resize:none;"></textarea></div></div></div>
+    <div class="f-section"><label class="f-lbl">Fotoğraf (opsiyonel)</label>
+      <div class="photo-area-sm" id="ser_photos"><div class="photo-add-sm" onclick="triggerPhoto('ser')">📷<span>Ekle</span></div></div>
+    </div>`;
 }
 
 // Show/hide "Diğer" renk input for serigrafi
@@ -964,6 +1018,10 @@ document.addEventListener('click',e=>{
   if(chip&&chip.closest('#ser_renk')){
     const wrap=document.getElementById('ser_diger_wrap');
     if(wrap)wrap.style.display=chip.dataset.val==='Diğer'&&chip.classList.contains('active')?'':'none';
+  }
+  if(chip&&chip.closest('#fitil_renk')){
+    const wrap=document.getElementById('fitil_ozel_renk_wrap');
+    if(wrap)wrap.style.display=chip.dataset.val==='Özel Renk'&&chip.classList.contains('active')?'':'none';
   }
 });
 
@@ -990,9 +1048,13 @@ function addProductItem(){
   else if(cat==='fitil'){
     item.size=getChip('fitil_urun');
     item.material=getChip('fitil_malzeme');
-    item.color=getChip('fitil_renk');
+    let renk=getChip('fitil_renk');
+    if(renk==='Özel Renk')renk=sel('fitil_ozel_renk')?.value.trim()||'Özel Renk';
+    item.color=renk;
     item.packaging=getChip('fitil_paket');
     item.quantity=sel('fitil_miktar')?.value.trim();
+    item.note=sel('fitil_not')?.value.trim();
+    item.photos=[...(productPhotos.fitil||[])];
     if(!item.size){valid=false;msg='Ürün ölçüsü seçiniz';}
     else if(!item.material){valid=false;msg='Malzeme seçiniz';}
     else if(!item.color){valid=false;msg='Renk seçiniz';}
@@ -1002,6 +1064,7 @@ function addProductItem(){
     item.size=getChip('balen_olcu');
     item.kasnak=getChip('balen_kasnak');
     item.color=getChip('balen_renk');
+    item.kalinlik=getChip('balen_kalinlik');
     item.quantity=sel('balen_miktar')?.value.trim();
     item.note=sel('balen_not')?.value.trim();
     if(!item.size){valid=false;msg='Balen ölçüsü seçiniz';}
@@ -1009,11 +1072,13 @@ function addProductItem(){
     else if(!item.color){valid=false;msg='Renk seçiniz';}
   }
   else if(cat==='kesme_balen'){
+    item.musteriIsmi=sel('kb_musteri')?.value.trim();
     item.size=getChip('kb_olcu');
     item.color=getChip('kb_renk');
     item.kalinlik=getChip('kb_kalinlik');
     item.kesmeRows=kbRows.filter(r=>r.uzunluk&&r.qty);
     item.note=sel('kb_not')?.value.trim();
+    item.photos=[...(productPhotos.kb||[])];
     if(!item.size){valid=false;msg='Balen ölçüsü seçiniz';}
     else if(!item.color){valid=false;msg='Renk seçiniz';}
     else if(!item.kalinlik){valid=false;msg='Kalınlık seçiniz';}
@@ -1040,6 +1105,7 @@ function addProductItem(){
     item.makaraMetre=getChip('ser_makara');
     item.quantity=sel('ser_miktar')?.value.trim();
     item.note=sel('ser_not')?.value.trim();
+    item.photos=[...(productPhotos.ser||[])];
     const prod=SERIGRAFI_URUNLER.find(u=>u.kod===item.productCode);
     if(prod)item.olcu=prod.olcu;
     if(!item.musteriIsmi){valid=false;msg='Müşteri ismi giriniz';}
@@ -1085,22 +1151,61 @@ function submitOrder(){
 }
 
 // ════════════════════════════════════════════
-// ADMIN — USER MANAGEMENT
+// SETTINGS
 // ════════════════════════════════════════════
-function renderAdmin(){
-  const el=document.getElementById('userListEl');if(!el)return;
+function openSettings(){
+  renderSettingsUserList();
+  // Fill cancel order select
+  const sel=document.getElementById('cancelOrderSelect');
+  const active=orders.filter(o=>o.status!=='gonderildi'&&o.status!=='iptal');
+  sel.innerHTML='<option value="">-- Sipariş seçin --</option>'+
+    active.map(o=>`<option value="${o.id}">#${o.id} · ${o.createdByName} · ${o.status}</option>`).join('');
+  showSheet('settingsOverlay');
+}
+function renderSettingsUserList(){
+  const el=document.getElementById('settingsUserList');if(!el)return;
   el.innerHTML=users.map(u=>`
-    <div class="admin-card">
-      <div style="width:14px;height:14px;border-radius:50%;background:${u.color};flex-shrink:0;"></div>
-      <div class="admin-info">
-        <div class="admin-name">${u.name}</div>
-        <div class="admin-role">${roleLabel(u.role)} ${u.email?'· '+u.email:''}</div>
+    <div style="display:flex;align-items:center;gap:.7rem;padding:.7rem 1rem;border-bottom:1px solid var(--sep);">
+      <div style="width:10px;height:10px;border-radius:50%;background:${u.color};flex-shrink:0;"></div>
+      <div style="flex:1;">
+        <div style="font-size:.9rem;font-weight:800;color:var(--text);">${u.name}</div>
+        <div style="font-size:.72rem;color:var(--text3);font-weight:600;">${roleLabel(u.role)}</div>
       </div>
-      <div class="admin-btns">
-        <button class="au-btn au-edit" onclick="openEditUser('${u.id}')">Düzenle</button>
-        ${u.id!=='yonetici'?`<button class="au-btn au-del" onclick="deleteUser('${u.id}')">Sil</button>`:''}
+      <div style="display:flex;gap:.4rem;">
+        <button onclick="openEditUser('${u.id}')" style="background:var(--blue-bg);color:var(--blue);border:none;border-radius:8px;padding:4px 10px;font-family:var(--font);font-size:.72rem;font-weight:800;cursor:pointer;">Düzenle</button>
+        ${u.id!=='yonetici'?`<button onclick="deleteUser('${u.id}')" style="background:var(--red-bg);color:var(--red);border:none;border-radius:8px;padding:4px 10px;font-family:var(--font);font-size:.72rem;font-weight:800;cursor:pointer;">Sil</button>`:''}
       </div>
     </div>`).join('');
+}
+function cancelSelectedOrder(){
+  const id=document.getElementById('cancelOrderSelect').value;
+  if(!id){showToast('⚠ Sipariş seçiniz');return;}
+  if(!confirm('Bu siparişi iptal etmek istiyor musun?'))return;
+  const o=orders.find(x=>x.id===id);if(!o)return;
+  const prev=o.status;
+  o.status='iptal';o.updatedAt=nowStr();
+  o.timeline=o.timeline||[];
+  o.timeline.push({status:'iptal',at:nowStr(),by:curUser.id,byName:curUser.name});
+  saveLocal();
+  // Notify fabrika
+  addNotifToFabrika(o,'iptal');
+  syncAction('updateOrder',{order:o,prevStatus:prev});
+  closeSheet('settingsOverlay');renderAll();
+  showToast('❌ Sipariş iptal edildi');
+}
+function addNotifToFabrika(order,status){
+  const label={iptal:'Sipariş İptal Edildi',gonderildi:'Sipariş Gönderildi'}[status]||status;
+  // Notify fabrika users
+  users.filter(u=>u.role==='fabrika'||u.role==='yonetici').forEach(u=>{
+    notifs.unshift({
+      id:'n'+Date.now()+Math.random(),
+      orderId:order.id,toUser:u.id,
+      fromUser:curUser.id,fromName:curUser.name,
+      status,label,at:nowStr(),ts:Date.now(),read:false,
+    });
+  });
+  notifs=notifs.slice(0,200);
+  saveLocal();updateBadges();
 }
 const COLOR_POOL=['#06b6d4','#8b5cf6','#f59e0b','#10b981','#ec4899','#14b8a6','#f97316','#84cc16','#6366f1','#e879f9'];
 function openAddUser(){
@@ -1147,8 +1252,50 @@ function deleteUser(id){
 }
 
 // ════════════════════════════════════════════
-// HELPERS
+// PHOTO HANDLING
 // ════════════════════════════════════════════
+let curPhotoTarget=null; // 'kb' or 'ser'
+const productPhotos={kb:[],ser:[]};
+
+function triggerPhoto(target){
+  curPhotoTarget=target;
+  document.getElementById('productPhotoInput').click();
+}
+function handleProductPhoto(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    const src=ev.target.result;
+    productPhotos[curPhotoTarget]=productPhotos[curPhotoTarget]||[];
+    productPhotos[curPhotoTarget].push(src);
+    const area=document.getElementById(curPhotoTarget+'_photos');
+    if(area){
+      const idx=productPhotos[curPhotoTarget].length-1;
+      const img=document.createElement('img');
+      img.src=src;img.className='photo-thumb-sm';
+      img.onclick=()=>{
+        productPhotos[curPhotoTarget].splice(idx,1);
+        renderPhotoArea(curPhotoTarget);
+      };
+      area.insertBefore(img,area.firstChild);
+    }
+  };
+  r.readAsDataURL(f);e.target.value='';
+}
+function renderPhotoArea(target){
+  const area=document.getElementById(target+'_photos');
+  if(!area)return;
+  const photos=productPhotos[target]||[];
+  area.innerHTML=photos.map((src,i)=>`<img src="${src}" class="photo-thumb-sm" onclick="removeProductPhoto('${target}',${i})" title="Kaldır">`).join('')
+    +`<div class="photo-add-sm" onclick="triggerPhoto('${target}')">📷<span>Ekle</span></div>`;
+}
+function removeProductPhoto(target,i){
+  productPhotos[target].splice(i,1);
+  renderPhotoArea(target);
+}
+function resetPhotos(){
+  productPhotos.kb=[];productPhotos.ser=[];productPhotos.fitil=[];
+}
 function nowStr(){
   return new Date().toLocaleString('tr-TR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
 }

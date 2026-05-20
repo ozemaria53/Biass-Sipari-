@@ -36,7 +36,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .app{max-width:480px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;}
 
 /* LOGIN */
-#loginScreen{position:fixed;inset:0;z-index:9000;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem 1.5rem;}
+#loginScreen{position:fixed;inset:0;z-index:9000;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:calc(2rem + env(safe-area-inset-top)) 1.5rem calc(2rem + env(safe-area-inset-bottom));}
 .login-box{width:100%;max-width:380px;}
 .login-title{font-size:2.2rem;font-weight:700;color:var(--text);text-align:center;margin-bottom:.3rem;}
 .login-sub{font-size:.85rem;color:var(--text3);text-align:center;margin-bottom:2rem;}
@@ -46,7 +46,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .login-err{color:var(--red);font-size:.9rem;font-weight:700;text-align:center;min-height:1.4rem;margin-top:.3rem;}
 
 /* TOPBAR */
-.topbar{background:var(--nav);padding:.85rem 1rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 16px rgba(0,0,0,.3);}
+.topbar{background:var(--nav);padding:calc(.85rem + env(safe-area-inset-top)) 1rem .85rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 16px rgba(0,0,0,.3);}
 .top-left{display:flex;align-items:center;gap:.6rem;}
 .top-title{font-size:1.2rem;font-weight:700;color:white;line-height:1.2;}
 .top-sub{font-size:.65rem;color:rgba(255,255,255,.55);font-weight:600;}
@@ -651,6 +651,7 @@ function showApp(){
   document.getElementById('topName').textContent=u.name;
   logActivity('Giriş yapıldı');
   loadFromServer().then(()=>{renderAll();updateBadges();startPolling();});
+  initPushNotifications();
 }
 function doLogout(){
   logActivity('Çıkış yapıldı');
@@ -1184,10 +1185,9 @@ function submitOrder(){
   const mm=String(now.getMonth()+1).padStart(2,'0');
   const yyyy=now.getFullYear();
   const dateStr=dd+mm+yyyy;
-  // Bugünkü sipariş sayısını bul
-  const todayOrders=orders.filter(o=>o.id&&o.id.includes(dateStr));
-  const seq=String(todayOrders.length+1).padStart(2,'0');
-  const id='SIP-'+dateStr+'-'+seq;
+  const todayOrders=orders.filter(o=>o.id&&o.id.startsWith(dateStr+'-'));
+  const seq=todayOrders.length+1;
+  const id=dateStr+'-'+seq;
   const order={
     id,createdBy:curUser.id,createdByName:curUser.name,createdAt:nowStr(),ts:Date.now(),
     status:'alinmadi',items:[...curItems],note:document.getElementById('orderNote')?.value.trim()||'',
@@ -1408,6 +1408,50 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelect
 
 // PWA
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+
+// ════════════════════════════
+// CAPACITOR PUSH NOTIFICATIONS
+// ════════════════════════════
+async function initPushNotifications(){
+  // Capacitor yoksa (PWA modunda) çık
+  if(!window.Capacitor||!window.Capacitor.isNativePlatform())return;
+  try{
+    const {PushNotifications}=window.Capacitor.Plugins;
+    if(!PushNotifications)return;
+
+    // İzin iste
+    const perm=await PushNotifications.requestPermissions();
+    if(perm.receive==='granted'){
+      await PushNotifications.register();
+    }
+
+    // Token al — Apps Script'e kaydet
+    PushNotifications.addListener('registration',async token=>{
+      console.log('FCM Token:',token.value);
+      if(curUser){
+        curUser.fcmToken=token.value;
+        const u=users.find(x=>x.id===curUser.id);
+        if(u)u.fcmToken=token.value;
+        localStorage.setItem(KU,JSON.stringify(users));
+        // Sunucuya kaydet
+        await syncAction('updateUsers',{users});
+      }
+    });
+
+    // Bildirim geldi (uygulama açıkken)
+    PushNotifications.addListener('pushNotificationReceived',notif=>{
+      showToast('🔔 '+notif.title+': '+notif.body);
+      loadFromServer().then(()=>renderAll());
+    });
+
+    // Bildirime tıklandı
+    PushNotifications.addListener('pushNotificationActionPerformed',action=>{
+      loadFromServer().then(()=>renderAll());
+      switchTab('notifs');
+    });
+
+  }catch(e){console.warn('Push init error:',e);}
+}
 
 // Sayfa yenilemede oturumu koru
 window.addEventListener('load',()=>{

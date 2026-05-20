@@ -1573,41 +1573,35 @@ if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.ser
 // CAPACITOR PUSH NOTIFICATIONS
 // ════════════════════════════
 async function initPushNotifications(){
-  // Capacitor yoksa (PWA modunda) çık
   if(!window.Capacitor||!window.Capacitor.isNativePlatform())return;
   try{
     const {PushNotifications}=window.Capacitor.Plugins;
     if(!PushNotifications)return;
 
-    // İzin iste
     const perm=await PushNotifications.requestPermissions();
-    if(perm.receive==='granted'){
-      await PushNotifications.register();
-    }
+    if(perm.receive!=='granted')return;
 
-    // Token al — Apps Script'e kaydet
+    await PushNotifications.register();
+
     PushNotifications.addListener('registration',async token=>{
-      console.log('FCM Token:',token.value);
-      if(curUser){
-        curUser.fcmToken=token.value;
-        const u=users.find(x=>x.id===curUser.id);
-        if(u)u.fcmToken=token.value;
-        localStorage.setItem(KU,JSON.stringify(users));
-        // Sunucuya kaydet
-        await syncAction('updateUsers',{users});
-      }
+      if(!curUser)return;
+      // FCM token'ı Supabase'e kaydet
+      await supaUpdate('users',curUser.id,{fcm_token:token.value});
+      curUser.fcmToken=token.value;
+      const u=users.find(x=>x.id===curUser.id);
+      if(u)u.fcmToken=token.value;
+      localStorage.setItem(KU,JSON.stringify(users));
     });
 
-    // Bildirim geldi (uygulama açıkken)
+    // Uygulama açıkken bildirim gelince
     PushNotifications.addListener('pushNotificationReceived',notif=>{
-      showToast('🔔 '+notif.title+': '+notif.body);
+      showToast('🔔 '+notif.title+(notif.body?' — '+notif.body:''));
       loadFromServer().then(()=>renderAll());
     });
 
-    // Bildirime tıklandı
-    PushNotifications.addListener('pushNotificationActionPerformed',action=>{
-      loadFromServer().then(()=>renderAll());
-      switchTab('notifs');
+    // Bildirime tıklanınca
+    PushNotifications.addListener('pushNotificationActionPerformed',()=>{
+      loadFromServer().then(()=>{renderAll();switchTab('notifs');});
     });
 
   }catch(e){console.warn('Push init error:',e);}

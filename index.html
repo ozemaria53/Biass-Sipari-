@@ -1190,7 +1190,7 @@ function buildProductForm(cat){
     return`<div class="f-section"><label class="f-lbl">Ürün Ölçüsü</label><div class="option-grid" id="fitil_urun">${opts}</div></div>
     <div class="f-section"><label class="f-lbl">Malzeme</label>${chipGroup('fitil_malzeme',['TPU','PVC'])}</div>
     <div class="f-section"><label class="f-lbl">Renk</label>${chipGroup('fitil_renk',['Şeffaf','Siyah','Buzlu','Özel Renk'])}<div class="f-card" id="fitil_ozel_wrap" style="display:none;"><div class="f-row"><span class="f-ico">🎨</span><input type="text" id="fitil_ozel" placeholder="Özel renk adı..."></div></div></div>
-    <div class="f-section"><label class="f-lbl">Paketleme</label>${chipGroup('fitil_paket',['Poşet','Makara'])}</div>
+    <div class="f-section"><label class="f-lbl">Paketleme</label>${chipGroup('fitil_paket',['Poşet','Makara','Koli'])}</div>
     <div class="f-section"><label class="f-lbl">Sipariş Miktarı</label><div class="f-card"><div class="f-row"><span class="f-ico">📦</span><input type="text" id="fitil_miktar" placeholder="Ör: 5.000 metre, 10.000 metre..." list="fitil_list" autocomplete="off"></div></div></div>
     <div class="f-section"><label class="f-lbl">Özel Not</label><div class="f-card"><div class="f-row"><span class="f-ico">📝</span><textarea id="fitil_not" style="height:56px;resize:none;" placeholder="Özel not (opsiyonel)..."></textarea></div></div></div>
     <div class="f-section"><label class="f-lbl">Fotoğraf (opsiyonel)</label><div class="photo-area-sm" id="fitil_photos"><div class="photo-add-sm" onclick="triggerPhoto('fitil')">📷<span>Ekle</span></div></div></div>`;

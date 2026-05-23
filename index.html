@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="./icon-192.png">
 <title>Biass Fabrika Sipariş</title>
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;font-family:Helvetica,"Helvetica Neue",Arial,sans-serif;}
 :root{
   --bg:#0f172a;--card:#1e293b;--card2:#263348;--sep:rgba(255,255,255,.08);
   --text:#ffffff;--text2:#e2e8f0;--text3:#94a3b8;
@@ -154,16 +154,16 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 
 /* DETAIL */
 .detail-section{padding:.5rem 1rem;}
-.detail-hdr{font-size:.78rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin:.7rem 0 .4rem;}
-.detail-row{display:flex;justify-content:space-between;padding:.5rem 0;border-bottom:1px solid var(--sep);font-size:.9rem;}
+.detail-hdr{font-size:.78rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin:.7rem 0 .4rem;font-family:var(--font);}
+.detail-row{display:flex;justify-content:space-between;padding:.5rem 0;border-bottom:1px solid var(--sep);font-size:.9rem;font-family:var(--font);}
 .detail-row:last-child{border-bottom:none;}
-.detail-key{color:var(--text3);font-weight:600;}
-.detail-val{color:var(--text);font-weight:700;text-align:right;max-width:60%;}
+.detail-key{color:var(--text3);font-weight:600;font-family:var(--font);}
+.detail-val{color:var(--text);font-weight:700;text-align:right;max-width:60%;font-family:var(--font);}
 .timeline-item{display:flex;gap:.7rem;padding:.6rem 0;}
 .timeline-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:3px;}
 .timeline-body{flex:1;}
-.timeline-title{font-size:.88rem;font-weight:700;color:var(--text);}
-.timeline-date{font-size:.72rem;color:var(--text3);font-weight:600;margin-top:1px;}
+.timeline-title{font-size:.88rem;font-weight:700;color:var(--text);font-family:var(--font);}
+.timeline-date{font-size:.72rem;color:var(--text3);font-weight:600;margin-top:1px;font-family:var(--font);}
 
 /* PHOTO */
 .photo-area-sm{display:flex;gap:.5rem;flex-wrap:wrap;padding:.6rem 1rem;}
@@ -266,16 +266,18 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
       </div>
       <div id="addedItems"></div>
       <div style="margin-top:.5rem;">
+        <label class="f-lbl" style="padding:0;">Öncelik</label>
+        <div style="display:flex;gap:.5rem;margin-bottom:.6rem;">
+          <button id="prioNormal" onclick="setPrio('normal')" style="flex:1;padding:.7rem;border:2px solid var(--border);border-radius:10px;font-family:var(--font);font-size:.9rem;font-weight:700;cursor:pointer;background:var(--green-bg);color:var(--green);border-color:var(--green);">✅ Normal</button>
+          <button id="prioOnemli" onclick="setPrio('onemli')" style="flex:1;padding:.7rem;border:2px solid var(--border);border-radius:10px;font-family:var(--font);font-size:.9rem;font-weight:700;cursor:pointer;background:var(--card2);color:var(--text3);">⚠️ Önemli</button>
+          <button id="prioAcil" onclick="setPrio('acil')" style="flex:1;padding:.7rem;border:2px solid var(--border);border-radius:10px;font-family:var(--font);font-size:.9rem;font-weight:700;cursor:pointer;background:var(--card2);color:var(--text3);">🚨 Acil</button>
+        </div>
         <label class="f-lbl" style="padding:0;">Sipariş Notu</label>
         <div class="f-card">
           <div class="f-row">
             <span class="f-ico">📝</span>
             <textarea id="orderNote" placeholder="Genel sipariş notu (opsiyonel)..." style="height:60px;resize:none;"></textarea>
           </div>
-        </div>
-        <div style="display:flex;gap:.4rem;margin-top:-.3rem;margin-bottom:.5rem;">
-          <button onclick="addNoteTag('🚨 ACİL!')" style="background:#dc2626;color:white;border:none;border-radius:8px;padding:.5rem .9rem;font-family:var(--font);font-size:.88rem;font-weight:700;cursor:pointer;">🚨 ACİL!</button>
-          <button onclick="addNoteTag('⚠️ ÖNEMLİ NOT!')" style="background:#d97706;color:white;border:none;border-radius:8px;padding:.5rem .9rem;font-family:var(--font);font-size:.88rem;font-weight:700;cursor:pointer;">⚠️ ÖNEMLİ NOT!</button>
         </div>
       </div>
       <button class="submit-btn blue" onclick="submitOrder()" style="margin-left:0;margin-right:0;width:100%;">📤 Siparişi Gönder</button>
@@ -439,10 +441,68 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
             <button onclick="showActivityLog()" style="width:100%;background:var(--teal);color:white;border:none;border-radius:10px;padding:.8rem;font-family:var(--font);font-size:1rem;font-weight:700;cursor:pointer;">📊 Kullanıcı Aktivitesi</button>
           </div>
         </div>
+        <div style="background:var(--card2);border-radius:14px;border:1.5px solid var(--sep);margin-bottom:.7rem;overflow:hidden;">
+          <div style="padding:.8rem 1.1rem;font-size:.82rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;border-bottom:1.5px solid var(--sep);">📦 Ürün Yönetimi</div>
+          <div style="padding:.6rem 1rem .8rem;">
+            <button onclick="openProductManager()" style="width:100%;background:var(--orange);color:white;border:none;border-radius:10px;padding:.8rem;font-family:var(--font);font-size:1rem;font-weight:700;cursor:pointer;">Ürünleri Yönet</button>
+          </div>
+        </div>
       </div>
 
       <div style="text-align:center;font-size:.8rem;color:var(--text3);">Sipariş Sistemi v2</div>
     </div>
+  </div>
+</div>
+
+<!-- ÜRÜN YÖNETİMİ -->
+<div class="overlay" id="productManagerOverlay" onclick="oClose(event,'productManagerOverlay')">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-hdr"><div class="sheet-title">📦 Ürün Yönetimi</div><button class="sheet-close" onclick="closeSheet('productManagerOverlay')">✕</button></div>
+    <div style="padding:.7rem 1rem 0;">
+      <label class="f-lbl">Kategori</label>
+      <div class="f-card" style="margin-bottom:.7rem;">
+        <div class="f-row">
+          <span class="f-ico">📂</span>
+          <select id="pmCat" onchange="renderPMForm();renderPMList()" style="flex:1;background:none;border:none;outline:none;font-family:var(--font);font-size:1rem;font-weight:700;color:var(--text);">
+            <option value="seffaf_lastik">Şeffaf Lastik</option>
+            <option value="fitil">Fitiller</option>
+            <option value="balen_olculer">Balenler — Ölçü</option>
+            <option value="balen_kasnaklar">Balenler — Kasnak</option>
+            <option value="balen_renkler">Balenler — Renk</option>
+            <option value="makara_seffaf">Makara Şeffaf Lastik</option>
+            <option value="serigrafi">Serigrafi Baskı</option>
+          </select>
+        </div>
+      </div>
+      <label class="f-lbl">Yeni Seçenek Ekle</label>
+      <div id="pmFormArea"></div>
+      <button onclick="addProductToList()" style="width:100%;background:var(--blue);color:white;border:none;border-radius:10px;padding:.8rem;font-family:var(--font);font-size:1rem;font-weight:700;cursor:pointer;margin-bottom:.8rem;">+ Ekle</button>
+      <label class="f-lbl">Mevcut Seçenekler</label>
+      <div id="pmList" style="background:var(--card2);border-radius:12px;border:1.5px solid var(--sep);overflow:hidden;margin-bottom:1rem;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ÜRÜN DÜZENLE -->
+<div class="overlay" id="productEditOverlay" onclick="oClose(event,'productEditOverlay')">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-hdr">
+      <div class="sheet-title">✏️ Ürün Düzenle</div>
+      <button class="sheet-close" onclick="closeSheet('productEditOverlay')">✕</button>
+    </div>
+    <div class="f-section" style="margin-top:.5rem;">
+      <label class="f-lbl">Ürün Kodu</label>
+      <div class="f-card"><div class="f-row"><span class="f-ico">🏷</span><input type="text" id="peKod" placeholder="ör: ASK-0724"></div></div>
+    </div>
+    <div class="f-section">
+      <label class="f-lbl">Ölçü</label>
+      <div class="f-card"><div class="f-row"><span class="f-ico">📐</span><input type="text" id="peOlcu" placeholder="ör: 7x0,24"></div></div>
+    </div>
+    <input type="hidden" id="peCat">
+    <input type="hidden" id="peIdx">
+    <button class="submit-btn blue" onclick="saveEditProduct()">💾 Kaydet</button>
   </div>
 </div>
 
@@ -500,14 +560,16 @@ const GS_URL='https://script.google.com/macros/s/AKfycbxaxCJ0yaYcTY2YnKXq4IUgacE
 
 // ── ÜRÜN LİSTELERİ ──
 const SEFFAF_LASTIK=[
-  {kod:'ASK-0212',olcu:'2x0,12'},{kod:'ASK-0312',olcu:'3x0,12'},{kod:'ASK-0315',olcu:'3x0,15'},
+  {kod:'ASK-0312',olcu:'3x0,12'},{kod:'ASK-0315',olcu:'3x0,15'},
   {kod:'ASK-0412',olcu:'4x0,12'},{kod:'ASK-0415',olcu:'4x0,15'},{kod:'ASK-0420',olcu:'4x0,20'},
   {kod:'ASK-0510',olcu:'5x0,10'},{kod:'ASK-0512',olcu:'5x0,12'},{kod:'ASK-0515',olcu:'5x0,15'},
   {kod:'ASK-0518',olcu:'5x0,18'},{kod:'ASK-0522',olcu:'5x0,22'},{kod:'ASK-0608',olcu:'6x0,08'},
   {kod:'ASK-0610',olcu:'6x0,10'},{kod:'ASK-0612',olcu:'6x0,12'},{kod:'ASK-0615',olcu:'6x0,15'},
-  {kod:'ASK-0618',olcu:'6x0,18'},{kod:'ASK-0622',olcu:'6x0,22'},{kod:'ASK-0630',olcu:'6x0,30'},
+  {kod:'ASK-0618',olcu:'6x0,18'},{kod:'ASK-0622',olcu:'6x0,22'},{kod:'ASK-0626',olcu:'6x0,26'},{kod:'ASK-0630',olcu:'6x0,30'},
   {kod:'ASK-0712',olcu:'7x0,12'},{kod:'ASK-0715',olcu:'7x0,15'},{kod:'ASK-0718',olcu:'7x0,18'},
-  {kod:'ASK-0812',olcu:'8x0,12'},{kod:'ASK-0815',olcu:'8x0,15'},{kod:'ASK-1012',olcu:'10x0,12'},
+  {kod:'ASK-0812',olcu:'8x0,12'},{kod:'ASK-0815',olcu:'8x0,15'},{kod:'ASK-0830',olcu:'8x0,30'},
+  {kod:'ASK-1012',olcu:'10x0,12'},{kod:'ASK-1024',olcu:'10x0,24'},{kod:'ASK-1030',olcu:'10x0,30'},
+  {kod:'ASK-1524',olcu:'15x0,24'},{kod:'ASK-2024',olcu:'20x0,24'},{kod:'ASK-2524',olcu:'25x0,24'},{kod:'ASK-3030',olcu:'30x0,30'},
 ];
 const FITIL=[
   {olcu:'0,70 MM',metre:'500 M'},{olcu:'0,80 MM',metre:'500 M'},{olcu:'0,90 MM',metre:'500 M'},
@@ -526,7 +588,7 @@ const MAKARA=[
   {kod:'ASK-1530',olcu:'15X0,30'},{kod:'ASK-2024',olcu:'20X0,24'},{kod:'ASK-2524',olcu:'25X0,24'},
   {kod:'ASK-3030B',olcu:'30X0,30'},{kod:'ASK-3526',olcu:'35X0,26'},{kod:'ASK-4026',olcu:'40X0,26'},
 ];
-const SERIGRAFI_URUNLER=MAKARA.slice(0,13);
+const SERIGRAFI_URUNLER=MAKARA.slice(0,12);
 const BALEN_OLCULER=['4 mm','5 mm','6 mm','7 mm','8 mm','10 mm'];
 const BALEN_KASNAKLAR=['Küçük Kasnak (150 m)','Standart Kasnak (200 m)','Büyük Kasnak (500 m)'];
 const BALEN_RENKLER=['Standart','Siyah','Beyaz'];
@@ -542,11 +604,184 @@ const KB_UZUNLUKLAR=Array.from({length:91},(_,i)=>50+(i*5)).filter(v=>v<=500).ma
 // ════════════════════════════
 let orders=[],users=[],notifs=[],curUser=null,activeTab='orders',orderFilter='all';
 let curProductCat=null,curItems=[],kbRows=[],editOrderItems=[];
+let curPrio='normal';
+
+function setPrio(p){
+  curPrio=p;
+  const configs={
+    normal:{bg:'var(--green-bg)',color:'var(--green)',border:'var(--green)'},
+    onemli:{bg:'var(--orange-bg)',color:'var(--orange)',border:'var(--orange)'},
+    acil:{bg:'var(--red-bg)',color:'var(--red)',border:'var(--red)'},
+  };
+  ['normal','onemli','acil'].forEach(key=>{
+    const btn=document.getElementById('prio'+key.charAt(0).toUpperCase()+key.slice(1));
+    if(!btn)return;
+    if(key===p){
+      btn.style.background=configs[key].bg;
+      btn.style.color=configs[key].color;
+      btn.style.borderColor=configs[key].border;
+    }else{
+      btn.style.background='var(--card2)';
+      btn.style.color='var(--text3)';
+      btn.style.borderColor='var(--border)';
+    }
+  });
+}
 let productPhotos={sl:[],fitil:[],makara:[],ser:[],kb:[]};
 let curPhotoTarget=null;
 let pollTimer=null;
 const KU='bs_users2',KO='bs_orders2',KN='bs_notifs2',KAL='bs_activity2';
 let activityLog=[];
+
+// ════════════════════════════
+// ÜRÜN YÖNETİMİ
+// ════════════════════════════
+const KCP='bs_custom_products';
+let customProducts={};
+
+// productLists: tüm ürün listeleri Supabase'den gelir, yoksa default kullan
+let productLists={
+  seffaf_lastik:[...SEFFAF_LASTIK],
+  fitil:[...FITIL],
+  balen_olculer:['4 mm','5 mm','6 mm','7 mm','8 mm','10 mm'].map(v=>({kod:v,olcu:''})),
+  balen_kasnaklar:['Küçük Kasnak (150 m)','Standart Kasnak (200 m)','Büyük Kasnak (500 m)'].map(v=>({kod:v,olcu:''})),
+  balen_renkler:['Standart','Siyah','Beyaz'].map(v=>({kod:v,olcu:''})),
+  makara_seffaf:[...MAKARA],
+  serigrafi:[...SERIGRAFI_URUNLER],
+  kesme_balen:[],
+};
+let productListsLoaded=false;
+
+function loadCustomProducts(){
+  try{
+    const saved=JSON.parse(localStorage.getItem(KCP));
+    if(saved&&Object.keys(saved).length){
+      productLists=saved;
+      productListsLoaded=true;
+    }
+  }catch(e){}
+}
+async function loadProductListsFromSupabase(){
+  try{
+    const rows=await supaGet('orders','id=eq.__products__&select=items');
+    if(rows&&rows[0]&&rows[0].items){
+      productLists=rows[0].items;
+      localStorage.setItem(KCP,JSON.stringify(productLists));
+      productListsLoaded=true;
+    }
+  }catch(e){}
+}
+function saveCustomProducts(){
+  localStorage.setItem(KCP,JSON.stringify(productLists));
+  // Supabase'e kaydet
+  supaUpsert('orders',{
+    id:'__products__',items:productLists,status:'config',
+    created_by:'system',created_by_name:'system',created_at:'',ts:0,
+    note:'',termin:'',termin_note:'',gonderim_tarihi:'',gonderim_notu:'',updated_at:'',timeline:[]
+  }).catch(()=>{});
+}
+function getProductList(cat){
+  return productLists[cat]||[];
+}
+function openProductManager(){
+  closeSheet('settingsOverlay');
+  renderPMForm();
+  renderPMList();
+  showSheet('productManagerOverlay');
+}
+function renderPMForm(){
+  const cat=document.getElementById('pmCat').value;
+  const area=document.getElementById('pmFormArea');
+  if(!area)return;
+  const isBalen=cat.startsWith('balen_');
+  const isKodOlcu=['seffaf_lastik','fitil','makara_seffaf','serigrafi'].includes(cat);
+  if(isBalen){
+    // Balen: sadece tek bir metin alanı (ör: "12 mm", "Altın Kasnak (300 m)")
+    area.innerHTML=`<div class="f-card" style="margin-bottom:.5rem;">
+      <div class="f-row"><span class="f-ico">📝</span><input type="text" id="pmKod" placeholder="${cat==='balen_olculer'?'Ör: 12 mm':cat==='balen_kasnaklar'?'Ör: Büyük Kasnak (400 m)':'Ör: Kırmızı'}"></div>
+    </div>`;
+  }else{
+    area.innerHTML=`<div class="f-card" style="margin-bottom:.5rem;">
+      <div class="f-row"><span class="f-ico">🏷</span><input type="text" id="pmKod" placeholder="Ürün Kodu (ör: ASK-0724)"></div>
+      <div class="f-row" style="border-top:1px solid var(--sep);"><span class="f-ico">📐</span><input type="text" id="pmOlcu" placeholder="Ölçü (ör: 7x0,24)"></div>
+    </div>`;
+  }
+}
+function renderPMList(){
+  const cat=document.getElementById('pmCat').value;
+  const list=getProductList(cat);
+  const el=document.getElementById('pmList');
+  const isBalen=cat.startsWith('balen_');
+  if(!list.length){
+    el.innerHTML='<div style="padding:1rem;text-align:center;color:var(--text3);">Seçenek yok. Yukarıdan ekleyebilirsiniz.</div>';
+    return;
+  }
+  el.innerHTML=list.map((p,i)=>{
+    const kod=p.kod||p.olcu||'';
+    const olcu=p.olcu||'';
+    const isYeni=p.ozel&&p.addedAt&&(Date.now()-p.addedAt)<30*24*60*60*1000;
+    return`<div style="display:flex;align-items:center;padding:.65rem 1rem;border-bottom:1px solid var(--sep);gap:.6rem;">
+      <div style="flex:1;">
+        <span style="font-weight:700;color:var(--text);font-size:.9rem;font-family:var(--font);">${kod}</span>
+        ${!isBalen&&olcu&&olcu!==kod?`<span style="color:var(--text3);font-size:.8rem;margin-left:.4rem;font-family:var(--font);">${olcu}</span>`:''}
+        ${isYeni?'<span style="background:#7c3aed;color:white;border-radius:4px;padding:1px 6px;font-size:.65rem;font-weight:700;margin-left:.4rem;">YENİ</span>':''}
+      </div>
+      <button onclick="editProduct('${cat}',${i})" style="background:var(--blue-bg);color:var(--blue);border:1.5px solid var(--blue);border-radius:7px;padding:3px 9px;font-family:var(--font);font-size:.8rem;font-weight:700;cursor:pointer;">✏️</button>
+      <button onclick="removeProduct('${cat}',${i})" style="background:var(--red-bg);color:var(--red);border:1.5px solid var(--red);border-radius:7px;padding:3px 9px;font-family:var(--font);font-size:.8rem;font-weight:700;cursor:pointer;margin-left:.3rem;">Sil</button>
+    </div>`;
+  }).join('');
+}
+function addProductToList(){
+  const cat=document.getElementById('pmCat').value;
+  const isBalen=cat.startsWith('balen_');
+  const kodEl=document.getElementById('pmKod');
+  if(!kodEl){showToast('⚠ Form yüklenmedi');return;}
+  const kod=isBalen?kodEl.value.trim():(kodEl.value.trim().toUpperCase());
+  const olcuEl=document.getElementById('pmOlcu');
+  const olcu=olcuEl?olcuEl.value.trim():'';
+  if(!kod){showToast('⚠ Değer giriniz');return;}
+  if(!productLists[cat])productLists[cat]=[];
+  if(productLists[cat].some(p=>p.kod===kod)){showToast('⚠ Bu değer zaten var');return;}
+  productLists[cat].push({kod,olcu,ozel:true,addedAt:Date.now()});
+  saveCustomProducts();
+  kodEl.value='';
+  if(olcuEl)olcuEl.value='';
+  renderPMList();
+  showToast('✅ Eklendi');
+}
+function editProduct(cat,idx){
+  const p=productLists[cat]?.[idx];
+  if(!p)return;
+  document.getElementById('peKod').value=p.kod||'';
+  document.getElementById('peOlcu').value=p.olcu||'';
+  document.getElementById('peCat').value=cat;
+  document.getElementById('peIdx').value=idx;
+  showSheet('productEditOverlay');
+}
+function saveEditProduct(){
+  const cat=document.getElementById('peCat').value;
+  const idx=parseInt(document.getElementById('peIdx').value);
+  const kod=document.getElementById('peKod').value.trim().toUpperCase();
+  const olcu=document.getElementById('peOlcu').value.trim();
+  if(!kod){showToast('⚠ Kod boş olamaz');return;}
+  const p=productLists[cat]?.[idx];
+  if(!p)return;
+  productLists[cat][idx]={...p,kod,olcu};
+  saveCustomProducts();
+  closeSheet('productEditOverlay');
+  renderPMList();
+  showToast('✅ Ürün güncellendi');
+}
+function removeProduct(cat,idx){
+  const p=productLists[cat]?.[idx];
+  if(!p)return;
+  const kod=p.kod||p.olcu||'';
+  if(!confirm('"'+kod+'" silinsin mi? Bu işlem geri alınamaz.'))return;
+  productLists[cat].splice(idx,1);
+  saveCustomProducts();
+  renderPMList();
+  showToast('Silindi');
+}
 
 // ════════════════════════════
 // PERSIST
@@ -831,7 +1066,7 @@ function switchTab(tab){
     if(btn)btn.classList.toggle('active',v===tab);
     if(el)el.style.display=v===tab?'block':'none';
   });
-  if(tab==='new'){curItems=[];renderAddedItems();}
+  if(tab==='new'){curItems=[];curPrio='normal';renderAddedItems();setTimeout(()=>setPrio('normal'),50);}
   renderAll();
 }
 function renderAll(){
@@ -912,11 +1147,18 @@ function buildOrderCard(o){
     acts=`<button class="order-act-btn btn-detail" onclick="openDetail('${o.id}')">Detay Gör</button>`;
   }
 
-  return`<div class="order-card">
+  const prioStyle={acil:'border:2px solid var(--red);box-shadow:0 0 0 3px rgba(239,68,68,.15);',onemli:'border:2px solid var(--orange);box-shadow:0 0 0 3px rgba(249,115,22,.12);',normal:''}[o.priority||'normal']||'';
+  const prioBadge={
+    acil:`<span style="background:var(--red);color:white;border-radius:6px;padding:2px 8px;font-size:.72rem;font-weight:700;white-space:nowrap;">🚨 ACİL</span>`,
+    onemli:`<span style="background:var(--orange);color:white;border-radius:6px;padding:2px 8px;font-size:.72rem;font-weight:700;white-space:nowrap;">⚠️ ÖNEMLİ</span>`,
+    normal:'',
+  }[o.priority||'normal']||'';
+
+  return`<div class="order-card" style="${prioStyle}">
     <div class="order-card-hdr">
       <div class="order-status-stripe stripe-${o.status}"></div>
       <div class="order-info">
-        <div class="order-id">Sipariş #${o.id}</div>
+        <div class="order-id">Sipariş #${o.id} ${prioBadge}</div>
         <div class="order-creator"><div class="order-creator-dot" style="background:${u.color};"></div>${u.name}</div>
         <div class="order-date">${o.createdAt}</div>
       </div>
@@ -1179,7 +1421,10 @@ function sel(id){return document.getElementById(id);}
 
 function buildProductForm(cat){
   if(cat==='seffaf_lastik'){
-    const opts=SEFFAF_LASTIK.map(u=>`<div class="option-chip" data-val="${u.kod}" onclick="toggleChip('sl_urun','${u.kod}')" style="min-width:110px;">${u.kod}<br><span style="font-size:.7rem;opacity:.7;">${u.olcu}</span></div>`).join('');
+    const opts=getProductList('seffaf_lastik').map(u=>{
+      const isYeni=u.ozel&&u.addedAt&&(Date.now()-u.addedAt)<30*24*60*60*1000;
+      return`<div class="option-chip" data-val="${u.kod}" onclick="toggleChip('sl_urun','${u.kod}')" style="min-width:110px;">${u.kod}${isYeni?'<span style="background:#7c3aed;color:white;border-radius:3px;padding:0 4px;font-size:.6rem;font-weight:700;margin-left:3px;">YENİ</span>':''}<br><span style="font-size:.7rem;opacity:.7;">${u.olcu||''}</span></div>`;
+    }).join('');
     return`<div class="f-section"><label class="f-lbl">Ürün Seçimi</label><div class="option-grid" id="sl_urun">${opts}</div></div>
     <div class="f-section"><label class="f-lbl">Varyasyon</label>${chipGroup('sl_renk',['Buzlu','Cam Gibi','Siyah'])}</div>
     <div class="f-section"><label class="f-lbl">Paketleme</label>${chipGroup('sl_paket',['Poşet','Makara'])}</div>
@@ -1219,14 +1464,20 @@ function buildProductForm(cat){
     <div class="f-section"><label class="f-lbl">Fotoğraf (opsiyonel)</label><div class="photo-area-sm" id="kb_photos"><div class="photo-add-sm" onclick="triggerPhoto('kb')">📷<span>Ekle</span></div></div></div>`;
   }
   if(cat==='makara_seffaf'){
-    const opts=MAKARA.map(u=>`<div class="option-chip" data-val="${u.kod}" onclick="toggleChip('mak_urun','${u.kod}')" style="min-width:110px;">${u.kod}<br><span style="font-size:.7rem;opacity:.7;">${u.olcu}</span></div>`).join('');
+    const opts=getProductList('makara_seffaf').map(u=>{
+      const isYeni=u.ozel&&u.addedAt&&(Date.now()-u.addedAt)<30*24*60*60*1000;
+      return`<div class="option-chip" data-val="${u.kod}" onclick="toggleChip('mak_urun','${u.kod}')" style="min-width:110px;">${u.kod}${isYeni?'<span style="background:#7c3aed;color:white;border-radius:3px;padding:0 4px;font-size:.6rem;font-weight:700;margin-left:3px;">YENİ</span>':''}<br><span style="font-size:.7rem;opacity:.7;">${u.olcu||''}</span></div>`;
+    }).join('');
     return`<div class="f-section"><label class="f-lbl">Ürün Seçimi</label><div class="option-grid" id="mak_urun">${opts}</div></div>
     <div class="f-section"><label class="f-lbl">Varyasyon</label>${chipGroup('mak_renk',['Buzlu','Cam Gibi','Siyah','Yarı Buzlu'])}</div>
     <div class="f-section"><label class="f-lbl">Makara Metresi</label>${chipGroup('mak_metre',MAKARA_METRELER)}</div>
     <div class="f-section"><label class="f-lbl">Sipariş Miktarı</label><div class="f-card"><div class="f-row"><span class="f-ico">📦</span><input type="text" id="mak_miktar" placeholder="Ör: 2.500 metre, 5.000 metre..." list="mak_list" autocomplete="off"></div></div></div>`;
   }
   if(cat==='serigrafi'){
-    const opts=SERIGRAFI_URUNLER.map(u=>`<div class="option-chip" data-val="${u.kod}" onclick="toggleChip('ser_urun','${u.kod}')" style="min-width:110px;">${u.kod}<br><span style="font-size:.7rem;opacity:.7;">${u.olcu}</span></div>`).join('');
+    const opts=getProductList('serigrafi').map(u=>{
+      const isYeni=u.ozel&&u.addedAt&&(Date.now()-u.addedAt)<30*24*60*60*1000;
+      return`<div class="option-chip" data-val="${u.kod}" onclick="toggleChip('ser_urun','${u.kod}')" style="min-width:110px;">${u.kod}${isYeni?'<span style="background:#7c3aed;color:white;border-radius:3px;padding:0 4px;font-size:.6rem;font-weight:700;margin-left:3px;">YENİ</span>':''}<br><span style="font-size:.7rem;opacity:.7;">${u.olcu||''}</span></div>`;
+    }).join('');
     return`<div class="f-section"><label class="f-lbl">Müşteri İsmi</label><div class="f-card"><div class="f-row"><span class="f-ico">👤</span><input type="text" id="ser_musteri" placeholder="Müşteri adı..."></div></div></div>
     <div class="f-section"><label class="f-lbl">Ürün Seçimi</label><div class="option-grid" id="ser_urun">${opts}</div></div>
     <div class="f-section"><label class="f-lbl">Baskı Rengi</label>${chipGroup('ser_renk',['Siyah','Altın Yaldız','Gümüş','Diğer'])}<div class="f-card" id="ser_diger_wrap" style="display:none;"><div class="f-row"><span class="f-ico">🎨</span><input type="text" id="ser_diger" placeholder="Renk belirtin..."></div></div></div>
@@ -1285,6 +1536,7 @@ function addProductItem(){
   }else if(cat==='balen'){
     item.size=getChip('balen_olcu');item.kasnak=getChip('balen_kasnak');item.color=getChip('balen_renk');
     item.kalinlik=getChip('balen_kalinlik');item.quantity=sel('balen_miktar')?.value.trim();item.note=sel('balen_not')?.value.trim();
+    const balenOlculer=getProductList('balen_olculer').map(p=>p.kod);
     if(!item.size){valid=false;msg='Balen ölçüsü seçiniz';}
     else if(!item.kasnak){valid=false;msg='Kasnak seçiniz';}
     else if(!item.color){valid=false;msg='Renk seçiniz';}
@@ -1351,6 +1603,7 @@ function submitOrder(){
   const order={
     id,createdBy:curUser.id,createdByName:curUser.name,createdAt:nowStr(),ts:Date.now(),
     status:'alinmadi',items:[...curItems],note:document.getElementById('orderNote')?.value.trim()||'',
+    priority:curPrio||'normal',
     timeline:[{status:'alinmadi',at:nowStr(),by:curUser.id,byName:curUser.name}],
     termin:'',terminNote:'',gonderimTarihi:'',gonderimNotu:'',updatedAt:'',
   };
@@ -1519,14 +1772,6 @@ function deleteUser(id){
 }
 
 // ════════════════════════════
-// ACİL NOTES
-// ════════════════════════════
-function addNoteTag(tag){
-  const el=document.getElementById('orderNote');if(!el)return;
-  el.value=(el.value?el.value+' ':'')+tag;el.focus();
-}
-
-// ════════════════════════════
 // ACTIVITY LOG
 // ════════════════════════════
 function logActivity(msg){
@@ -1620,8 +1865,12 @@ window.addEventListener('load',()=>{
 // INIT
 // ════════════════════════════
 loadLocal();
+loadCustomProducts();
 buildDD();
 initDarkMode();
+
+// Supabase'den ürün listelerini çek
+loadProductListsFromSupabase().catch(()=>{});
 </script>
 
 <!-- Miktar önerileri -->
